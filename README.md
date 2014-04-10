@@ -1,58 +1,51 @@
-This daemon script can be used to keep an s3-hosted yum repository updated
-when new rpm packages are uploaded.  It is equivalent to using `createrepo`
-and an `s3cmd sync`.  Only a temporary copy of the repo metadata is needed
-locally, so there's no need to keep a full clone of the repository and all
-it's packages.  This is also very useful if packages are uploaded by many
-users or systems.  Having a single `repoupdate-daemon` will ensure all new
-packages are added to the repository metadata, avoiding issues with
-concurrent updates.
+# s3-rpm
 
-The upload of a new package to s3 should be handled by whatever client is
-used to build the rpm, e.g. a CI system like Jenkins.  The daemon listens
-for SNS notifications on an SQS queue which inform it of the path for these
-new rpm files.  The daemon then downloads the repodata, updates, and uploads
-again.
+This small tool allows you to maintain YUM repositories of RPM packages on S3. The code is largely derived from <https://github.com/rockpack/s3yum-updater>.
 
-You can use the included `publish-packages` script to upload rpms to s3 and
-notify the update daemon.
+The advantage of this tool is that it does not need a full copy of the repo to operate. Just give it the new package to add, and it will just update the repodata metadata, and upload the given rpm file.
 
-By default the daemon is configured to keep only the last two versions of
-each package.
+## Requirements
 
-Install
--------
+1. You have python installed (2.6+).
 
-You can use the included spec file to build an rpm and then `yum localinstall`
-it.
+1. You have your S3 credentials available in the `AWS_ACCESS_KEY` and `AWS_SECRET_KEY` environment variables:
 
-Configure
----------
+        export AWS_ACCESS_KEY="key"
+        export AWS_SECRET_KEY="secret"
 
-Create an s3 bucket to host the yum repository.  Create an SNS topic and an SQS
-queue that is subscribed to it.
+## Usage
 
-Override default options:
+Let's say I want to add a `my-app-1.0.0.x86_64.rpm` package to a yum repo hosted in the `yummy-yummy` S3 bucket, at the path `centos/6`:
 
-    echo 'OPTIONS="$OPTIONS -b mybucket -q myqueue"' >/etc/sysconfig/repoupdate-daemon
+    python repoupdate.py -b yummy-yummy -p "centos/6" my-app-1.0.0.x86_64.rpm
 
-The daemon uses standard boto configuation to access the AWS credentials: IAM
-role, environment variables, or boto config file.
+## Testing
 
-Run
----
+    python repoupdate.py -b yummy-yummy -p "centos/6" --sign my-app-1.0.0.x86_64.rpm
 
-    service repoupdate-daemon start
+    echo "[myrepo]
+    name = This is my repo
+    baseurl = https://s3.amazonaws.com/yummy-yummy/centos/6" > /etc/yum.repos.d/myrepo.repo
 
-Test
-----
+    yum makecache --disablerepo=* --enablerepo=myrepo
 
-    publish-packages --bucket mybucket --sns-topic mytopic *.rpm
+    yum install --nogpgcheck my-app
 
----
+## Troubleshooting
 
-Related Tools
--------------
+* Requirements if you want to sign packages
 
-https://github.com/seporaitis/yum-s3-iam
-https://wiki.jenkins-ci.org/display/JENKINS/S3+Plugin
-https://wiki.jenkins-ci.org/display/JENKINS/Amazon+SNS+Notifier
+Have a gnupg key ready in your keychain at `~/.gnupg`. You can list existing secret keys with `gpg --list-secret-keys`
+
+Have a `~/.rpmmacros` file ready with the following content:
+
+    %_signature gpg
+    %_gpg_name Cyril Rohr # put the name of your key here
+
+Pass the `--sign` option to `repoupdate`:
+
+    AWS_ACCESS_KEY="key" AWS_SECRET_KEY="secret" python repoupdate.py --sign my-app-1.0.0.x86_64.rpm
+
+* Import gpg key to install signed packages
+
+    sudo rpm --import path/to/public/key # this also accepts URLs
