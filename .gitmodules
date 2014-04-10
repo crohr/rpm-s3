@@ -1,3 +1,6 @@
 [submodule "vendor/createrepo"]
 	path = vendor/createrepo
 	url = http://createrepo.baseurl.org/git/createrepo.git
+[submodule "vendor/pexpect"]
+	path = vendor/pexpect
+	url = https://github.com/pexpect/pexpect.git
