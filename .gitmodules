@@ -1,0 +1,3 @@
+[submodule "vendor/createrepo"]
+	path = vendor/createrepo
+	url = http://createrepo.baseurl.org/git/createrepo.git
