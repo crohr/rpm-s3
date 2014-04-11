@@ -23,11 +23,11 @@ If you're looking for the same kind of tool, but for APT repositories, I can rec
 
 Let's say I want to add a `my-app-1.0.0.x86_64.rpm` package to a yum repo hosted in the `yummy-yummy` S3 bucket, at the path `centos/6`:
 
-    ./repoupdate.py -b yummy-yummy -p "centos/6" my-app-1.0.0.x86_64.rpm
+    ./bin/rpm-s3 -b yummy-yummy -p "centos/6" my-app-1.0.0.x86_64.rpm
 
 ## Testing
 
-    ./repoupdate.py -b yummy-yummy -p "centos/6" --sign my-app-1.0.0.x86_64.rpm
+    ./bin/rpm-s3 -b yummy-yummy -p "centos/6" --sign my-app-1.0.0.x86_64.rpm
 
     echo "[myrepo]
     name = This is my repo
@@ -48,9 +48,9 @@ Have a `~/.rpmmacros` file ready with the following content:
     %_signature gpg
     %_gpg_name Cyril Rohr # put the name of your key here
 
-Pass the `--sign` option to `repoupdate`:
+Pass the `--sign` option to `rpm-s3`:
 
-    AWS_ACCESS_KEY="key" AWS_SECRET_KEY="secret" ./repoupdate.py --sign my-app-1.0.0.x86_64.rpm
+    AWS_ACCESS_KEY="key" AWS_SECRET_KEY="secret" ./bin/rpm-s3 --sign my-app-1.0.0.x86_64.rpm
 
 ### Import gpg key to install signed packages
 

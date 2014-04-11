@@ -13,10 +13,13 @@ import collections
 import yum
 import boto
 import subprocess
-sys.path.insert(1, "/vagrant/s3yum-updater/vendor/pexpect")
+
+lib_root = os.path.dirname(os.path.dirname(__file__))
+
+sys.path.insert(1, os.path.join(lib_root, "vendor/pexpect"))
 import pexpect
 
-sys.path.insert(1, "/vagrant/s3yum-updater/vendor/createrepo")
+sys.path.insert(1, os.path.join(lib_root, "vendor/createrepo"))
 import createrepo
 
 # Hack for creating s3 urls
@@ -120,7 +123,7 @@ def setup_repository(repo, repopath):
     if key:
         logging.info("Existing repository detected.")
     else:
-        path_to_empty_repo = os.path.join(os.path.dirname(__file__), "empty-repo", "repodata")
+        path_to_empty_repo = os.path.join(lib_root, "empty-repo", "repodata")
         logging.info("Empty repository detected. Initializing with empty repodata...")
         repo._grab.syncdir(path_to_empty_repo, "repodata")
 
