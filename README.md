@@ -39,7 +39,7 @@ Let's say I want to add a `my-app-1.0.0.x86_64.rpm` package to a yum repo hosted
 
 ## Troubleshooting
 
-* Requirements if you want to sign packages
+### Requirements if you want to sign packages
 
 Have a gnupg key ready in your keychain at `~/.gnupg`. You can list existing secret keys with `gpg --list-secret-keys`
 
@@ -52,6 +52,11 @@ Pass the `--sign` option to `repoupdate`:
 
     AWS_ACCESS_KEY="key" AWS_SECRET_KEY="secret" ./repoupdate.py --sign my-app-1.0.0.x86_64.rpm
 
-* Import gpg key to install signed packages
+### Import gpg key to install signed packages
 
     sudo rpm --import path/to/public/key # this also accepts URLs
+
+## TODO
+
+* Release as python package.
+* Add spec and control files for RPM and DEB packaging.
