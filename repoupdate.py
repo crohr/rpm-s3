@@ -68,7 +68,6 @@ class S3Grabber(object):
             key.set_contents_from_filename(os.path.join(dir, filename))
             key.set_acl(self.visibility)
             new_keys.append(key.name)
-            logging.info('visibility: %s', self.visibility)
             logging.info('uploading: %s', key.name)
         for key in existing_keys:
             if key.name not in new_keys:
@@ -181,10 +180,7 @@ def update_repodata(repopath, rpmfiles, options):
     mdgen.doRepoMetadata()
     mdgen.doFinalMove()
 
-    # TODO, sign repomd.xml
-    # gpg -u KEY --detach-sign --armor repodata/repomd.xml
-    #
-    # update *.rpm to destination
+    # Upload rpm files to destination
     for rpmfile in rpmfiles:
         rpmfile = os.path.realpath(rpmfile)
         logging.info("rpmfile: %s", rpmfile)

@@ -1,8 +1,10 @@
-# s3-rpm
+# rpm-s3
 
-This small tool allows you to maintain YUM repositories of RPM packages on S3. The code is largely derived from <https://github.com/rockpack/s3yum-updater>.
+This small tool allows you to maintain YUM repositories of RPM packages on S3. The code is largely derived from [s3yum-updater](https://github.com/rockpack/s3yum-updater).
 
 The advantage of this tool is that it does not need a full copy of the repo to operate. Just give it the new package to add, and it will just update the repodata metadata, and upload the given rpm file.
+
+If you're looking for the same kind of tool, but for APT repositories, I can recommend [deb-s3](https://github.com/krobertson/deb-s3).
 
 ## Requirements
 
@@ -12,6 +14,10 @@ The advantage of this tool is that it does not need a full copy of the repo to o
 
         export AWS_ACCESS_KEY="key"
         export AWS_SECRET_KEY="secret"
+
+## Installation
+
+    git clone https://github.com/crohr/rpm-s3 --recurse-submodules
 
 ## Usage
 
