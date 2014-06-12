@@ -164,10 +164,13 @@ def update_repodata(repopath, rpmfiles, options):
             sign(rpmfile)
 
         mdgen._grabber = filegrabber
-        newpkg = mdgen.read_in_package("file://" + rpmfile, repopath)
+        # please, don't mess with my path in the <location> tags of primary.xml.gz
+        relative_path = "."
+        newpkg = mdgen.read_in_package("file://" + rpmfile, relative_path)
         mdgen._grabber = s3grabber
 
-        # newpkg._baseurl = '/'   # don't leave s3 base urls in primary metadata
+        # don't put a base url in <location> tags of primary.xml.gz
+        newpkg._baseurl = None
         older_pkgs = yumbase.pkgSack.searchNevra(name=newpkg.name)
 
         # Remove older versions of this package (or if it's the same version)
