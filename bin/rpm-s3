@@ -105,6 +105,7 @@ class FileGrabber(object):
 
 def sign(rpmfile):
     """Requires a proper ~/.rpmmacros file. See <http://fedoranews.org/tchung/gpg/>"""
+    # TODO: check if file is indeed signed
     cmd = "rpm --resign '%s'" % rpmfile
     logging.info(cmd)
     try:
