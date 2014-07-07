@@ -1,0 +1,41 @@
+.TH "modifyrepo" "1" "2007 Dec 3" "Luke Macken" ""
+
+.SH "NAME"
+modifyrepo \- Modify a repomd (xml-rpm-metadata) repository
+
+.SH "SYNOPSIS"
+\fBmodifyrepo\fP [options] <input metadata> <output repodata>
+.PP
+
+.SH "DESCRIPTION"
+\fBmodifyrepo\fP is a program that allows you to insert arbitrary metadata into a repomd (xml-based rpm metadata) repository.
+
+.SH "EXAMPLES"
+.PP
+$ \fBmodifyrepo\fP \-\-mdtype=newmd metadata.xml /repository/repodata
+.br
+Wrote: /repository/repodata/metadata.xml.gz
+           type = newmd
+       location = repodata/metadata.xml.gz
+       checksum = 1d7ee93db2964e7f85e07ec19b3204591da1050c
+      timestamp = 1196716296.0
+  open-checksum = 824d936dc7dfff029379797b311af0cc66af4115
+.br
+Wrote: /repository/repodata/repomd.xml
+
+.PP 
+.SH "SEE ALSO"
+.I createrepo (8)
+
+.PP 
+.SH "AUTHORS"
+.nf 
+Luke Macken <lmacken@redhat.com>
+Seth Vidal <skvidal@fedoraproject.org>
+.fi 
+
+.PP 
+.SH "BUGS"
+Any bugs which are found should be emailed to the mailing list:
+rpm-metadata@lists.baseurl.org
+.fi

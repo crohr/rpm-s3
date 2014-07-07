@@ -1,0 +1,14 @@
+This program generates a repodata dir and xml files for a repository of 
+rpm packages. This repository is compatible with apt/yum/smart/yast and many
+other package-repository-related tools.
+
+run createrepo -h for usage syntax
+
+http://createrepo.baseurl.org/
+
+
+
+
+
+
+
