@@ -118,6 +118,18 @@ def sign(rpmfile):
         logging.error("Unable to sign package: %s", e)
         exit(1)
 
+def sign_metadata(repomdfile):
+    """Requires a proper ~/.rpmmacros file. See <http://fedoranews.org/tchung/gpg/>"""
+    cmd = "gpg --detach-sign --armor '%s'" % repomdfile
+    logging.info(cmd)
+    try:
+        child = pexpect.spawn(cmd)
+        child.expect(pexpect.EOF)
+    except pexpect.EOF, e:
+        print "Unable to sign repository metadata '%s' - %s" % (repomdfile, child.before)
+        logging.error("Unable to sign repository metadata: %s", e)
+        exit(1)
+
 def setup_repository(repo, repopath):
     """Make sure a repo is present at repopath"""
     key = repo._grab.check("repodata/repomd.xml")
@@ -192,6 +204,11 @@ def update_repodata(repopath, rpmfiles, options):
         rpmfile = os.path.realpath(rpmfile)
         logging.info("rpmfile: %s", rpmfile)
         s3grabber.upload(rpmfile, os.path.basename(rpmfile))
+
+
+    # Generate repodata/repomd.xml.asc
+    if options.sign:
+        sign_metadata(os.path.join(tmpdir, 'repodata', 'repomd.xml'))
 
     # Replace metadata on s3
     s3grabber.syncdir(os.path.join(tmpdir, 'repodata'), 'repodata')
