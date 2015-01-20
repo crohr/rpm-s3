@@ -67,11 +67,13 @@ class S3Grabber(object):
         existing_keys = list(self.bucket.list(base))
         new_keys = []
         for filename in sorted(os.listdir(dir)):
-            key = self.bucket.new_key(os.path.join(base, filename))
-            key.set_contents_from_filename(os.path.join(dir, filename))
+            source = os.path.join(dir, filename)
+            target = os.path.join(base, filename)
+            key = self.bucket.new_key(target)
+            key.set_contents_from_filename(source)
             key.set_acl(self.visibility)
             new_keys.append(key.name)
-            logging.info('uploading: %s', key.name)
+            logging.info('uploading: %s from: %s', key.name, source)
         for key in existing_keys:
             if key.name not in new_keys:
                 key.delete()
