@@ -122,14 +122,13 @@ def sign(rpmfile):
 
 def sign_metadata(repomdfile):
     """Requires a proper ~/.rpmmacros file. See <http://fedoranews.org/tchung/gpg/>"""
-    cmd = "gpg --detach-sign --armor '%s'" % repomdfile
+    cmd = ["gpg", "--detach-sign", "--armor", repomdfile]
     logging.info(cmd)
     try:
-        child = pexpect.spawn(cmd)
-        child.expect(pexpect.EOF)
+        subprocess.check_call(cmd)
         logging.info("Successfully signed repository metadata file")
-    except pexpect.EOF, e:
-        print "Unable to sign repository metadata '%s' - %s" % (repomdfile, child.before)
+    except subprocess.CalledProcessError, e:
+        print "Unable to sign repository metadata '%s'" % (repomdfile)
         logging.error("Unable to sign repository metadata: %s", e)
         exit(1)
 
