@@ -125,6 +125,7 @@ def sign_metadata(repomdfile):
     try:
         child = pexpect.spawn(cmd)
         child.expect(pexpect.EOF)
+        logging.info("Successfully signed repository metadata file")
     except pexpect.EOF, e:
         print "Unable to sign repository metadata '%s' - %s" % (repomdfile, child.before)
         logging.error("Unable to sign repository metadata: %s", e)
