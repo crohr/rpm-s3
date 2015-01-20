@@ -27,7 +27,15 @@ Let's say I want to add a `my-app-1.0.0.x86_64.rpm` package to a yum repo hosted
 
 ## Testing
 
-    ./bin/rpm-s3 -b yummy-yummy -p "centos/6" --sign my-app-1.0.0.x86_64.rpm
+Use the provided `/test/test.sh` script:
+
+    vagrant up
+    vagrant ssh
+    AWS_ACCESS_KEY=xx AWS_SECRET_KET=yy BUCKET=zz ./test/test.sh
+
+Also:
+
+    ./bin/rpm-s3 -b s3-bucket -p "centos/6" --sign my-app-1.0.0.x86_64.rpm
 
     echo "[myrepo]
     name = This is my repo

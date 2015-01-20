@@ -1,3 +1,4 @@
-.gnupg/
+/.gnupg/
 venv/
-.rpmmacros
+/.rpmmacros
+/.vagrant
