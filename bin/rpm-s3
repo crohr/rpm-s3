@@ -193,7 +193,11 @@ def update_repodata(repopath, rpmfiles, options):
             if i > options.keep or older.pkgtup == newpkg.pkgtup:
                 yumbase.pkgSack.delPackage(older)
                 logging.info('ignoring: %s', older.ui_nevra)
-        new_packages.append(newpkg)
+        ## The package is now removed if it has the same name
+        ## If we passed -d true, then we don't want to add it back
+        ## if we didn't then we wnat to include the package
+        if options.delete is False:
+            new_packages.append(newpkg)
     mdconf.pkglist = list(yumbase.pkgSack) + new_packages
 
     # Write out new metadata to tmpdir
@@ -237,5 +241,6 @@ if __name__ == '__main__':
     parser.add_option('--visibility', default='private')
     parser.add_option('-s', '--sign', action='count', default=0)
     parser.add_option('-l', '--logfile')
+    parser.add_option('-d', '--delete', default=False)
     options, args = parser.parse_args()
     main(options, args)
