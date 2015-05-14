@@ -43,7 +43,7 @@ class S3Grabber(object):
         base = urlparse.urlsplit(baseurl)
         self.baseurl = baseurl
         self.basepath = base.path.lstrip('/')
-        self.bucket = boto.connect_s3().get_bucket(base.netloc)
+        self.bucket = getclient(base)
         self.visibility = visibility
 
     def check(self, url):
@@ -104,6 +104,14 @@ class FileGrabber(object):
         # the base path from its own tempdir, etc.
         os.symlink(realfilename, filename)
         return filename
+
+
+def getclient(base):
+    if os.getenv('AWS_ACCESS_KEY'):
+        return boto.connect_s3(os.getenv('AWS_ACCESS_KEY'), os.getenv('AWS_SECRET_KEY').get_bucket(base.netloc))
+    else:
+        return boto.connect_s3().get_bucket(base.netloc)
+
 
 def sign(rpmfile):
     """Requires a proper ~/.rpmmacros file. See <http://fedoranews.org/tchung/gpg/>"""
