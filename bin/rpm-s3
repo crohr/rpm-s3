@@ -43,7 +43,7 @@ class S3Grabber(object):
         base = urlparse.urlsplit(baseurl)
         self.baseurl = baseurl
         self.basepath = base.path.lstrip('/')
-        self.bucket = boto.connect_s3(os.environ['AWS_ACCESS_KEY'], os.environ['AWS_SECRET_KEY']).get_bucket(base.netloc)
+        self.bucket = boto.connect_s3().get_bucket(base.netloc)
         self.visibility = visibility
 
     def check(self, url):
