@@ -249,6 +249,6 @@ if __name__ == '__main__':
     parser.add_option('--visibility', default='private')
     parser.add_option('-s', '--sign', action='count', default=0)
     parser.add_option('-l', '--logfile')
-    parser.add_option('-d', '--delete', default=False)
+    parser.add_option('-d', '--delete', action='store_true', default=False)
     options, args = parser.parse_args()
     main(options, args)
