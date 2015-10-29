@@ -38,12 +38,12 @@ class LoggerCallback(object):
 
 
 class S3Grabber(object):
-    def __init__(self, baseurl, visibility):
+    def __init__(self, baseurl, visibility, region):
         logging.info('S3Grabber: %s', baseurl)
         base = urlparse.urlsplit(baseurl)
         self.baseurl = baseurl
         self.basepath = base.path.lstrip('/')
-        self.bucket = getclient(base)
+        self.bucket = getclient(base, region)
         self.visibility = visibility
 
     def check(self, url):
@@ -106,11 +106,11 @@ class FileGrabber(object):
         return filename
 
 
-def getclient(base):
+def getclient(base, region):
     if os.getenv('AWS_ACCESS_KEY'):
-        return boto.connect_s3(os.getenv('AWS_ACCESS_KEY'), os.getenv('AWS_SECRET_KEY')).get_bucket(base.netloc, validate=False)
+        return boto.connect_s3(os.getenv('AWS_ACCESS_KEY'), os.getenv('AWS_SECRET_KEY'), host="s3-{}.amazonaws.com".format(region)).get_bucket(base.netloc)
     else:
-        return boto.connect_s3().get_bucket(base.netloc, validate=False)
+        return boto.connect_s3(host="s3-{}.amazonaws.com".format(region)).get_bucket(base.netloc)
 
 
 def sign(rpmfile):
@@ -154,7 +154,7 @@ def update_repodata(repopath, rpmfiles, options):
     logging.info('rpmfiles: %s', rpmfiles)
     tmpdir = tempfile.mkdtemp()
     s3base = urlparse.urlunsplit(('s3', options.bucket, repopath, '', ''))
-    s3grabber = S3Grabber(s3base, options.visibility)
+    s3grabber = S3Grabber(s3base, options.visibility, options.region)
     filegrabber = FileGrabber("file://" + os.getcwd())
 
     # Set up temporary repo that will fetch repodata from s3
@@ -250,5 +250,6 @@ if __name__ == '__main__':
     parser.add_option('-s', '--sign', action='count', default=0)
     parser.add_option('-l', '--logfile')
     parser.add_option('-d', '--delete', action='store_true', default=False)
+    parser.add_option('-r', '--region', default='eu-central-1')
     options, args = parser.parse_args()
     main(options, args)
