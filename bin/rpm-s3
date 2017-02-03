@@ -38,12 +38,12 @@ class LoggerCallback(object):
 
 
 class S3Grabber(object):
-    def __init__(self, baseurl, visibility, region):
+    def __init__(self, baseurl, visibility, host):
         logging.info('S3Grabber: %s', baseurl)
         base = urlparse.urlsplit(baseurl)
         self.baseurl = baseurl
         self.basepath = base.path.lstrip('/')
-        self.bucket = getclient(base, region)
+        self.bucket = getclient(base, host)
         self.visibility = visibility
 
     def check(self, url):
@@ -106,8 +106,7 @@ class FileGrabber(object):
         return filename
 
 
-def getclient(base, region):
-    host_url = "s3.amazonaws.com" if region == "us-east-1" else "s3-{}.amazonaws.com".format(region)
+def getclient(base, host_url):
     if os.getenv('AWS_ACCESS_KEY'):
         return boto.connect_s3(
             os.getenv('AWS_ACCESS_KEY'),
@@ -161,7 +160,7 @@ def update_repodata(repopath, rpmfiles, options):
     logging.info('rpmfiles: %s', rpmfiles)
     tmpdir = tempfile.mkdtemp()
     s3base = urlparse.urlunsplit(('s3', options.bucket, repopath, '', ''))
-    s3grabber = S3Grabber(s3base, options.visibility, options.region)
+    s3grabber = S3Grabber(s3base, options.visibility, options.host)
     filegrabber = FileGrabber("file://" + os.getcwd())
 
     # Set up temporary repo that will fetch repodata from s3
@@ -257,6 +256,11 @@ if __name__ == '__main__':
     parser.add_option('-s', '--sign', action='count', default=0)
     parser.add_option('-l', '--logfile')
     parser.add_option('-d', '--delete', action='store_true', default=False)
-    parser.add_option('-r', '--region', default='eu-central-1')
+    parser.add_option('-r', '--region')
+    parser.add_option('-c', '--host', default='s3-eu-central-1.amazonaws.com')
     options, args = parser.parse_args()
+    if options.region is not None and options.host != 's3-eu-central-1.amazonaws.com':
+        parser.error('region and host are mutually exclusive')
+    elif options.region is not None:
+        options.host = "s3.amazonaws.com" if options.region == "us-east-1" else "s3-{}.amazonaws.com".format(options.region)
     main(options, args)
